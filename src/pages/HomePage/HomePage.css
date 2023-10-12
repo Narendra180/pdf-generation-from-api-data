@@ -1,0 +1,22 @@
+.print-btn {
+  font-size: 1.5rem;
+  padding: 10px 20px;
+  background-color: rgb(0, 71, 224);
+  border: 0;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+}
+
+.homepage-root-div {
+  /* width: 100vw;
+  height: 100vh; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-root-div {
+  position: fixed;
+  left: -3000px;
+}
