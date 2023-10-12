@@ -50,6 +50,7 @@ const createFooter = async (doc, currentPageNo, totalNoOfPages) => {
   doc.fontSize(11).fillColor("black")                      
                       .text(pageNumberString.slice(0, 33), (pageWidth - 50) - pageNumberStringWidth - 1, pageHeight - 23.5, {  continued: true })
                           .fillColor("#626E99")
+                          .text(pageNumberString.slice(33), {lineBreak: false})
 
   const lineGradientColor = doc.linearGradient(0, 40, pageWidth - 100, 40);
   lineGradientColor.stop(0, "#005DFF").stop(0.5, "#00A3FF").stop(1, "#21DDFF");
