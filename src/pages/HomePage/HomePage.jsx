@@ -48,20 +48,26 @@ function HomePage() {
   })
 
   useEffect(() => {
-    // fetchApiData();
+    fetchApiData();
   }, []);
 
   const getChartImage = () => {
     const chartInstance = chartRef.current;
     if(chartInstance) {
       console.log(chartInstance.toBase64Image())
+      return chartInstance.toBase64Image();
+    } else {
+      return null;
     }
   }
 
-  // getChartImage();
-
   const handlePrintBtnClick = () => {
-    createPDF();
+    const base64Image = getChartImage();
+    if(base64Image) {
+      createPDF(base64Image);
+    } else {
+      throw new Error("Unable to generate pdf beacuse of unavailability of chart.");
+    }
   }
 
   return (

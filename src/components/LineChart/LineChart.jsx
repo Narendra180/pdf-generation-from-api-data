@@ -40,7 +40,7 @@ export const options = {
   plugins: {
     legend: {
       display: false,
-      position: 'top',
+      position: 'left',
     },
     title: {
       display: false,
@@ -103,7 +103,7 @@ const LineChart = forwardRef(({ labels, datasets }, ref) => {
     datasets
   }
 
-  console.log(data)
+  // console.log(data)
 
 
   return (

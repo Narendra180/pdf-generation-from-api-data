@@ -46,7 +46,7 @@ const createFooter = async (doc, currentPageNo, totalNoOfPages) => {
   const dateNumber = date.getDate();
   const year = date.getFullYear();
   const generatedDateString = `Report generated on ${monthName} ${dateNumber}, ${year}`;
-  console.log(pageHeight, pageWidth)
+  // console.log(pageHeight, pageWidth)
   doc.font('Helvetica-Bold').text(generatedDateString, 50, pageHeight - 23.5)
 
   const pageNumberString = `RealAssist Property Report|Page ${currentPageNo} of ${totalNoOfPages}`;
@@ -87,7 +87,7 @@ const addHeaderAndFooter = async (doc) => {
   }
 }
 
-const createPDF = async () => {
+const createPDF = async (base64Chart) => {
   // create a document the same way as above
   const doc = new PDFDocument({ autoFirstPage: false, bufferPages: true });
 
@@ -104,26 +104,29 @@ const createPDF = async () => {
     }
   });
 
+  const pageWidth = doc.page.width;
+  const pageHeight = doc.page.height;
+
   // add your content to the document here, as usual
 
+  doc.save();
+  doc.roundedRect(doc.x, doc.y, pageWidth - 100, 200, 10).clip();
+  doc.roundedRect(doc.x, doc.y, pageWidth - 100, 200, 10).fill("#F2F4F5");
+  doc.roundedRect(doc.x - 20, doc.y, pageWidth - 50, 30, 10).fill("#E8EEFB");
+  doc.restore();
+  doc.fontSize(14).fillColor("#1463FF")
+  const chartHeading = "Burglary";
+  doc.text(chartHeading, doc.x + 15, (doc.y + 30/2), { baseline: "middle"});
+  const arrestsLegend = "Arrests";
+  doc.save();
+  doc.rotate(-90, { origin: [70, 165]});
+  doc.fillColor("black").text(arrestsLegend, 70, 80 + (170/2), { baseline: "middle" })
+  doc.restore();
 
-  doc.fontSize(16);
-  doc.text(`This text is left aligned.`, {
-    width: 410,
-    align: 'left'
-  });
-
-  doc.fontSize(8);
-  doc.text(`This text is left aligned.`, {
-    width: 410,
-    align: 'left'
-  }
-  );
+  doc.roundedRect(90, 90, pageWidth - 180, 150, 10).fill("white");
+  doc.image(base64Chart, 95, 95, {width: pageWidth - 190, height: 140})
 
   await addHeaderAndFooter(doc);
-
-
-
 
 
   // get a blob when you're done
