@@ -87,6 +87,44 @@ const addHeaderAndFooter = async (doc) => {
   }
 }
 
+const createChartHeading = async (doc) => {
+  const pageWidth = doc.page.width;
+  const locationPng = await getImage("/location.png");
+  doc.image(locationPng, 50, 50, {width: 20, height: 15, });
+  doc.fontSize(16)
+  const crimeText = "Crime";
+  const crimeTextWidth = doc.widthOfString(crimeText);
+  doc.text(crimeText, 75, 52);
+
+  doc.save();
+  const lineGradientColor = doc.linearGradient(0, 40, pageWidth - 100, 40);
+  lineGradientColor.stop(0, "#005DFF").stop(0.5, "#00A3FF").stop(1, "#21DDFF");
+  doc.rect(50+29.5+crimeTextWidth, 57, pageWidth - (100+crimeTextWidth+29), 2);
+  doc.fill(lineGradientColor);
+  doc.restore();
+}
+
+const createChart = (doc, base64Chart) => {
+  const pageWidth = doc.page.width;
+
+  doc.save();
+  doc.roundedRect(50, 80, pageWidth - 100, 200, 10).clip();
+  doc.roundedRect(50, 80, pageWidth - 100, 200, 10).fill("#F2F4F5");
+  doc.roundedRect(50 - 20, 80, pageWidth - 50, 30, 10).fill("#E8EEFB");
+  doc.restore();
+  doc.fontSize(14).fillColor("#1463FF")
+  const chartHeading = "Burglary";
+  doc.text(chartHeading, 50 + 15, (80 + 30/2), { baseline: "middle"});
+  const arrestsLegend = "Arrests";
+  doc.save();
+  doc.rotate(-90, { origin: [70, 195]});
+  doc.fillColor("black").text(arrestsLegend, 70, 110 + (170/2), { baseline: "middle" })
+  doc.restore();
+
+  doc.roundedRect(90, 120, pageWidth - 180, 150, 10).fill("white");
+  doc.image(base64Chart, 95, 125, {width: pageWidth - 190, height: 140})
+}
+
 const createPDF = async (base64Chart) => {
   // create a document the same way as above
   const doc = new PDFDocument({ autoFirstPage: false, bufferPages: true });
@@ -109,22 +147,27 @@ const createPDF = async (base64Chart) => {
 
   // add your content to the document here, as usual
 
-  doc.save();
-  doc.roundedRect(doc.x, doc.y, pageWidth - 100, 200, 10).clip();
-  doc.roundedRect(doc.x, doc.y, pageWidth - 100, 200, 10).fill("#F2F4F5");
-  doc.roundedRect(doc.x - 20, doc.y, pageWidth - 50, 30, 10).fill("#E8EEFB");
-  doc.restore();
-  doc.fontSize(14).fillColor("#1463FF")
-  const chartHeading = "Burglary";
-  doc.text(chartHeading, doc.x + 15, (doc.y + 30/2), { baseline: "middle"});
-  const arrestsLegend = "Arrests";
-  doc.save();
-  doc.rotate(-90, { origin: [70, 165]});
-  doc.fillColor("black").text(arrestsLegend, 70, 80 + (170/2), { baseline: "middle" })
-  doc.restore();
+  await createChartHeading(doc);
 
-  doc.roundedRect(90, 90, pageWidth - 180, 150, 10).fill("white");
-  doc.image(base64Chart, 95, 95, {width: pageWidth - 190, height: 140})
+  createChart(doc, base64Chart);
+
+
+  // doc.save();
+  // doc.roundedRect(doc.x, doc.y, pageWidth - 100, 200, 10).clip();
+  // doc.roundedRect(doc.x, doc.y, pageWidth - 100, 200, 10).fill("#F2F4F5");
+  // doc.roundedRect(doc.x - 20, doc.y, pageWidth - 50, 30, 10).fill("#E8EEFB");
+  // doc.restore();
+  // doc.fontSize(14).fillColor("#1463FF")
+  // const chartHeading = "Burglary";
+  // doc.text(chartHeading, doc.x + 15, (doc.y + 30/2), { baseline: "middle"});
+  // const arrestsLegend = "Arrests";
+  // doc.save();
+  // doc.rotate(-90, { origin: [70, 165]});
+  // doc.fillColor("black").text(arrestsLegend, 70, 80 + (170/2), { baseline: "middle" })
+  // doc.restore();
+
+  // doc.roundedRect(90, 90, pageWidth - 180, 150, 10).fill("white");
+  // doc.image(base64Chart, 95, 95, {width: pageWidth - 190, height: 140})
 
   await addHeaderAndFooter(doc);
 
