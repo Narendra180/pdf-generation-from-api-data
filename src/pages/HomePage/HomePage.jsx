@@ -68,7 +68,7 @@ function HomePage() {
 
   const handleModalBtnClick = async () => {
     const base64Image = getChartImage();
-    console.log(base64Image)
+    // console.log(base64Image)
     if(base64Image) {
       const stream = await createPDF(base64Image);
       stream.on('finish', () => {
