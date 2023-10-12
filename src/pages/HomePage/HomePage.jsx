@@ -1,10 +1,15 @@
 import "./HomePage.css";
 import LineChart from "../../components/LineChart/LineChart";
 import { useState, useEffect, useCallback, useRef } from "react";
+import Modal from "../../components/Modal/Modal";
 import { createPDF } from "../../utils/utils";
+import { Button } from "react-bootstrap";
 
 function HomePage() {
   const [apiData, setApidata] = useState(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [iframeSrc, setIframesrc] = useState("");
 
   const chartRef = useRef(null);
 
@@ -54,17 +59,47 @@ function HomePage() {
   const getChartImage = () => {
     const chartInstance = chartRef.current;
     if(chartInstance) {
-      console.log(chartInstance.toBase64Image())
+      // console.log(chartInstance.toBase64Image())
       return chartInstance.toBase64Image();
     } else {
       return null;
     }
   }
 
-  const handlePrintBtnClick = () => {
+  const handleModalBtnClick = async () => {
+    const base64Image = getChartImage();
+    console.log(base64Image)
+    if(base64Image) {
+      const stream = await createPDF(base64Image);
+      stream.on('finish', () => {
+        const url = stream.toBlobURL('application/pdf');
+        setIframesrc(url);
+        setIsModalOpen(true);
+      })
+    } else {
+      setIframesrc("");
+      throw new Error("Unable to generate pdf beacuse of unavailability of chart.");
+    }
+  }
+
+  const handleDownloadBtnClick = async () => {
     const base64Image = getChartImage();
     if(base64Image) {
-      createPDF(base64Image);
+      const stream = await createPDF(base64Image);
+      stream.on('finish', () => {
+        const blob = stream.toBlob('application/pdf');
+        // console.log(blob)
+
+        const a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+
+        let url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = "report";
+        a.click();
+        window.URL.revokeObjectURL(url);
+      })
     } else {
       throw new Error("Unable to generate pdf beacuse of unavailability of chart.");
     }
@@ -72,12 +107,29 @@ function HomePage() {
 
   return (
     <div className="homepage-root-div">
-        <button 
-          className="print-btn"
-          onClick={handlePrintBtnClick}
+
+        <Button 
+          variant="primary"
+          onClick={handleDownloadBtnClick}
         >
-          Print
-        </button>
+          Download PDF
+        </Button>
+
+        <Button 
+          variant="info"
+          onClick={handleModalBtnClick}
+        >
+          Open PDF in Iframe Modal
+        </Button>
+
+        <Modal
+          show={isModalOpen}
+          onHide={() => {
+            setIsModalOpen(!isModalOpen);
+            setIframesrc("");
+          }}
+          src={iframeSrc}
+        />
 
         <div className="chart-root-div">
           { 
